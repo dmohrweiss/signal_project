@@ -7,6 +7,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * An implementation of {@link OutputStrategy} that writtes patient data to .txt.
+ * Each data label is saved to its own file within a base directory.
+ */
+
 //Classes start with capital letters.
 public class FileOutputStrategy implements OutputStrategy {
 
@@ -23,6 +28,15 @@ public class FileOutputStrategy implements OutputStrategy {
         this.baseDirectory = baseDirectory;
     }
 
+    /**
+     * Processes the data to a file corresponding to the data name.
+     * If the base directory does not exist, it will be created.
+     * * @param patientId ID.
+     * @param timestamp The time of the reading.
+     * @param label     The category of data.
+     * @param data      The actusal number.
+     * Prints errors to System.err if IO fails.
+     */
     @Override
     public void output(int patientId, long timestamp, String label, String data) {
         try {
