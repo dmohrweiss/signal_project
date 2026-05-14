@@ -4,9 +4,6 @@ import java.util.Random;
 
 import com.cardio_generator.outputs.OutputStrategy;
 
-/**
- * Generates simulated blood level data for patients.
- */
 public class BloodLevelsDataGenerator implements PatientDataGenerator {
     private static final Random random = new Random();
     private final double[] baselineCholesterol;
@@ -32,13 +29,9 @@ public class BloodLevelsDataGenerator implements PatientDataGenerator {
     }
 
     /**
-     * Generates a saturation reading by applying a small random incrementation or decrementation 
-     * to the patient's last value.
-     * * @param patientId ID
+     * @param patientId ID
      * @param outputStrategy The strategy used to send the resulting value.
      * @return The new saturation value is sent to the output strategy as a string 
-     * appended with '%'.
-     * Prints errors to System.err if generation fails.
      */
     @Override
     public void generate(int patientId, OutputStrategy outputStrategy) {

@@ -3,8 +3,6 @@ package com.cardio_generator.generators;
 import com.cardio_generator.outputs.OutputStrategy;
 /**
  * A common interface for all health metric generators.
- * Implementations simulate specific physiological data 
- *  and pass them.
  */
 public interface PatientDataGenerator {
     /**

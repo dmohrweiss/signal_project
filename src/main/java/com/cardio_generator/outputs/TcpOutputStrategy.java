@@ -7,7 +7,6 @@ import java.net.Socket;
 import java.util.concurrent.Executors;
 
 /**
- * An implementation of {@link OutputStrategy} that streams patient data.
  * waits for a single client connection before sending generated data.
  */
 public class TcpOutputStrategy implements OutputStrategy {
@@ -17,8 +16,7 @@ public class TcpOutputStrategy implements OutputStrategy {
     private PrintWriter out;
 
     /**
-     * Initializes a {@link java.net.ServerSocket} on the specified port.
-     * * @param port The network port to listen on. Expected range: 1024-65535.
+     * @param port The network port to listen on. Expected range: 1024-65535.
      */
     public TcpOutputStrategy(int port) {
         try {
@@ -43,7 +41,7 @@ public class TcpOutputStrategy implements OutputStrategy {
     /**
      * Sends the patient data to the connected client.
      * Data is formatted as a comma-separated.
-     * * @param patientId ID.
+     * @param patientId ID.
      * @param timestamp The time of the reading.
      * @param label     The category of data.
      * @param data      The Actual number.

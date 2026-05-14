@@ -24,7 +24,7 @@ public class BloodPressureDataGenerator implements PatientDataGenerator {
     @Override
     public void generate(int patientId, OutputStrategy outputStrategy) {
         try {
-            int systolicVariation = random.nextInt(5) - 2; // -2, -1, 0, 1, or 2
+            int systolicVariation = random.nextInt(5) - 2;
             int diastolicVariation = random.nextInt(5) - 2;
             int newSystolicValue = lastSystolicValues[patientId] + systolicVariation;
             int newDiastolicValue = lastDiastolicValues[patientId] + diastolicVariation;

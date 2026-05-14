@@ -27,19 +27,29 @@ import java.util.ArrayList;
 
 /**
  * The main entry point for the health monitoring simulation system.
- * This class coordinates the generation of various health metrics for a specified number
- * of patients and routes that data to a  output.
- * <p>
- * It utilizes a {@link java.util.concurrent.ScheduledExecutorService} to simulate 
- * data reporting at different frequencies
  */
 
 public class HealthDataSimulator {
+    private static HealthDataSimulator instance;
 
-    private static int patientCount = 50; // Default number of patients
-    private static ScheduledExecutorService scheduler;
-    private static OutputStrategy outputStrategy = new ConsoleOutputStrategy(); // Default output strategy
-    private static final Random random = new Random();
+    private int patientCount = 50;
+    private ScheduledExecutorService scheduler;
+    private OutputStrategy outputStrategy = new ConsoleOutputStrategy();
+    private final Random random = new Random();
+
+    private HealthDataSimulator() {
+    }
+
+    /**
+     * Gets the singleton instance of HealthDataSimulator.
+     * @return the HealthDataSimulator instance
+     */
+    public static synchronized HealthDataSimulator getInstance() {
+        if (instance == null) {
+            instance = new HealthDataSimulator();
+        }
+        return instance;
+    }
 
     /**
      * Starts the simulation.
@@ -48,23 +58,20 @@ public class HealthDataSimulator {
      * @throws IOException If there is an error creating directories for file.
      */
     public static void main(String[] args) throws IOException {
-
-        parseArguments(args);
-
-        scheduler = Executors.newScheduledThreadPool(patientCount * 4);
-
-        List<Integer> patientIds = initializePatientIds(patientCount);
-        Collections.shuffle(patientIds); // Randomize the order of patient IDs
-
-        scheduleTasksForPatients(patientIds);
+        HealthDataSimulator simulator = getInstance();
+        simulator.parseArguments(args);
+        simulator.scheduler = Executors.newScheduledThreadPool(simulator.patientCount * 4);
+        List<Integer> patientIds = simulator.initializePatientIds(simulator.patientCount);
+        Collections.shuffle(patientIds);
+        simulator.scheduleTasksForPatients(patientIds);
     }
 
     /**
      * Parses the command-line arguments to configure simulation parameters.
-     * * @param args The raw argument array from the main method.
+     * @param args The raw argument array from the main method.
      * @throws IOException If file system operations fail while setting up the output strategy.
      */
-    private static void parseArguments(String[] args) throws IOException {
+    private void parseArguments(String[] args) throws IOException {
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "-h":
@@ -96,7 +103,6 @@ public class HealthDataSimulator {
                         } else if (outputArg.startsWith("websocket:")) {
                             try {
                                 int port = Integer.parseInt(outputArg.substring(10));
-                                // Initialize your WebSocket output strategy here
                                 outputStrategy = new WebSocketOutputStrategy(port);
                                 System.out.println("WebSocket output will be on port: " + port);
                             } catch (NumberFormatException e) {
@@ -106,7 +112,6 @@ public class HealthDataSimulator {
                         } else if (outputArg.startsWith("tcp:")) {
                             try {
                                 int port = Integer.parseInt(outputArg.substring(4));
-                                // Initialize your TCP socket output strategy here
                                 outputStrategy = new TcpOutputStrategy(port);
                                 System.out.println("TCP socket output will be on port: " + port);
                             } catch (NumberFormatException e) {
@@ -144,11 +149,10 @@ public class HealthDataSimulator {
 
     /**
      * Generates a list of unique patient identifiers.
-     * * @param patientCount The total number of patients to generate IDs for. 
-     * Expected to be a positive integer.
-     * @return A {List<Integer>} with IDs from 1 to end.
+     * @param patientCount The total number of patients to generate IDs for.
+     * @return A List<Integer>
      */
-    private static List<Integer> initializePatientIds(int patientCount) {
+    private List<Integer> initializePatientIds(int patientCount) {
         List<Integer> patientIds = new ArrayList<>();
         for (int i = 1; i <= patientCount; i++) {
             patientIds.add(i);
@@ -157,11 +161,10 @@ public class HealthDataSimulator {
     }
 
     /**
-     * Instantiates the various data generators and schedules execution at 
-     * specific windows
-     * * @param patientIds The list of patient IDs for whom tasks will be scheduled.
+     * Instantiates the various data generators and schedules execution
+     * @param patientIds The list of patient IDs for whom tasks will be scheduled.
      */
-    private static void scheduleTasksForPatients(List<Integer> patientIds) {
+    private void scheduleTasksForPatients(List<Integer> patientIds) {
         ECGDataGenerator ecgDataGenerator = new ECGDataGenerator(patientCount);
         BloodSaturationDataGenerator bloodSaturationDataGenerator = new BloodSaturationDataGenerator(patientCount);
         BloodPressureDataGenerator bloodPressureDataGenerator = new BloodPressureDataGenerator(patientCount);
@@ -178,12 +181,11 @@ public class HealthDataSimulator {
     }
 
     /**
-     * Schedules a single task to run repeatedly with a randomized initial delay 
-     * to prevent thundering herd issues.
+     * Schedules a single task to run repeatedly at a fixed rate.
      * @param period   The time between successive executions.
      * @param timeUnit The time unit of the period and initial delay.
      */
-    private static void scheduleTask(Runnable task, long period, TimeUnit timeUnit) {
+    private void scheduleTask(Runnable task, long period, TimeUnit timeUnit) {
         scheduler.scheduleAtFixedRate(task, random.nextInt(5), period, timeUnit);
     }
 }
